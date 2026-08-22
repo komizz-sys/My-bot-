@@ -1,10 +1,12 @@
 import asyncio
 import logging
+import os
 import sqlite3
 from datetime import datetime, timedelta
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from telethon import TelegramClient, events
+from telethon.sessions import StringSession
 
 # ============================================================
 # SOZLAMALAR
@@ -35,10 +37,16 @@ logging.basicConfig(
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
-userbot = TelegramClient("dealer_userbot_session", API_ID, API_HASH)
+
+# Railway'dagi SESSION environment variable'ni xavfsiz o'qish
+session_string = os.environ.get("SESSION", "").strip()
+if not session_string:
+    logging.warning("DIQQAT: Railway'da SESSION topilmadi yoki bo'sh!")
+
+userbot = TelegramClient(StringSession(session_string), API_ID, API_HASH)
 
 # ============================================================
-# TELETHON: TARGET BOTLARNI KUZATISH
+# TELETHON: TARGET BOTLARni KUZATISH
 # ============================================================
 
 @userbot.on(events.NewMessage(incoming=True))
